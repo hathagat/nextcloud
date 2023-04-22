@@ -92,4 +92,4 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
-        run: echo "${{ steps.meta-upstream.outputs.tags }}" | xargs -I {} cosign sign ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}@${{ steps.build-and-push-upstream.outputs.digest }}
+        run: echo "${{ steps.meta-upstream.outputs.tags }}" | xargs -I {} cosign sign -y {}@${{ steps.build-and-push-upstream.outputs.digest }}
