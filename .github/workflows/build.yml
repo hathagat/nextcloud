@@ -1,4 +1,4 @@
-name: build
+name: build-upstream
 
 on:
   push:
@@ -43,6 +43,7 @@ jobs:
         force: true
 
   build:
+    needs: update
     runs-on: ubuntu-latest
     permissions:
       contents: read
