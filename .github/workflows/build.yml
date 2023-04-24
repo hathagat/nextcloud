@@ -31,24 +31,27 @@ jobs:
         # Dockerfile
         sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
-        sed -i '/^COPY.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
+        sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         sed -i '/^\/var\/run\/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         # https://www.tecmint.com/connect-nginx-to-php-fpm
-        echo "RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm\/www.sock/g' /usr/local/etc/php-fpm.d/www.conf" >>Dockerfile
+        echo "RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/www.conf" >>Dockerfile
 
         # Nginx
+        sed -i '/^pid        .*/a daemon off;' nginx.conf
         sed -i 's/listen 80/listen 9000/g' nginx.conf
-        sed -i 's/server app:9000/server unix:\/run\/php-fpm\/www.sock/g' nginx.conf
+        sed -i 's/server app:9000/server unix:\/run\/php-fpm.sock/g' nginx.conf
         sed -i 's/client_max_body_size 512M/client_max_body_size 0/g' nginx.conf
 
         # Supervisord
         cat >> supervisord.conf <<END
-          [program:nginx]
-          stdout_logfile=/dev/stdout
-          stdout_logfile_maxbytes=0
-          stderr_logfile=/dev/stderr
-          stderr_logfile_maxbytes=0
-          command=/usr/sbin/nginx
+        
+        [program:nginx]
+        stdout_logfile=/dev/stdout
+        stdout_logfile_maxbytes=0
+        stderr_logfile=/dev/stderr
+        stderr_logfile_maxbytes=0
+        command=/usr/sbin/nginx
+        
         END
 
     - name: Commit updates
