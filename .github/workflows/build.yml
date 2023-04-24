@@ -34,7 +34,7 @@ jobs:
         sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         sed -i '/^\/var\/run\/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         # https://www.tecmint.com/connect-nginx-to-php-fpm
-        echo "RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/www.conf" >>Dockerfile
+        echo "RUN sed -i 's/listen = 9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf" >>Dockerfile
 
         # Nginx
         sed -i '/^pid        .*/a daemon off;' nginx.conf
