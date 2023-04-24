@@ -13,7 +13,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -33,13 +32,15 @@ jobs:
         sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
         sed -i '/^COPY.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
+        sed -i '/^/var/run/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
+        cat >> Dockerfile <<END
+          # https://www.tecmint.com/connect-nginx-to-php-fpm
+          RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm\/www.sock/g' /usr/local/etc/php-fpm.d/www.conf
+        END     
         # Nginx
         sed -i 's/listen 80/listen 9000/g' nginx.conf
         sed -i 's/server app:9000/server unix:\/run\/php-fpm\/www.sock/g' nginx.conf
         sed -i 's/client_max_body_size 512M/client_max_body_size 0/g' nginx.conf
-        # PHP
-        # https://www.tecmint.com/connect-nginx-to-php-fpm
-        sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm\/www.sock/g' /usr/local/etc/php-fpm.d/www.conf
         # Supervisord
         cat >> supervisord.conf <<END
           [program:nginx]
