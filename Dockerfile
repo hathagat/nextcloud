@@ -55,8 +55,8 @@ RUN mkdir -p \
 
 COPY supervisord.conf /
 COPY --chown=33:33 nginx.conf /etc/nginx/
+COPY php-fpm.conf /usr/local/etc/php-fpm.d/zzz-nextcloud.conf
 
 ENV NEXTCLOUD_UPDATE=1
 
 CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
-RUN sed -i 's/listen = 9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf
