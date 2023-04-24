@@ -31,10 +31,9 @@ jobs:
         # Dockerfile
         sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
+        sed -i '/^COPY supervisord.conf.*/a COPY php-fpm.conf \/usr\/local\/etc\/php-fpm.d\/zzz-nextcloud.conf' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         sed -i '/^\/var\/run\/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
-        # https://www.tecmint.com/connect-nginx-to-php-fpm
-        echo "RUN sed -i 's/listen = 9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf" >>Dockerfile
 
         # Nginx
         sed -i '/^pid        .*/a daemon off;' nginx.conf
