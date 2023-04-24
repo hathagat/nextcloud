@@ -11,7 +11,7 @@ on:
 env:
   NEXTCLOUD_VERSION: 26
   REGISTRY: ghcr.io
-  BASE_IMAGE_NAME: ${{ github.repository }}-full-fpm
+  IMAGE_NAME: ${{ github.repository }}
 
 
 jobs:
@@ -22,11 +22,34 @@ jobs:
     - name: Checkout upstream files
       run: |
         git clone --depth 1 https://github.com/nextcloud/docker.git repo
-        mv repo/.examples/dockerfiles/full/fpm/Dockerfile Dockerfile-full-fpm
+        mv repo/.examples/dockerfiles/full/fpm/Dockerfile Dockerfile
         mv repo/.examples/dockerfiles/full/fpm/supervisord.conf supervisord.conf
+        mv repo/.examples/docker-compose/with-nginx-proxy/postgres/fpm/web/nginx.conf nginx.conf
         rm -r repo
-        sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile-full-fpm
-        
+
+    - name: Update files
+      run: |
+        # Dockerfile
+        sed -i 's|nextcloud:fpm|nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm|g' Dockerfile
+        sed -i 's|#       libreoffice|        nginx|g' Dockerfile
+        sed -i '|^COPY.*|a COPY --chown=33:33 nginx.conf /etc/nginx/' Dockerfile
+        # Nginx
+        sed -i 's|listen 80|listen 9000|g' nginx.conf
+        sed -i 's|server app:9000|server unix:/run/php-fpm/www.sock|g' nginx.conf
+        sed -i 's|client_max_body_size 512M|client_max_body_size 0|g' nginx.conf
+        # PHP
+        # https://www.tecmint.com/connect-nginx-to-php-fpm
+        sed -i 's|listen = 127.0.0.1:9000|listen = /run/php-fpm/www.sock|g' /usr/local/etc/php-fpm.d/www.conf
+        # Supervisord
+        cat >> supervisord.conf <<END
+          [program:nginx]
+          stdout_logfile=/dev/stdout
+          stdout_logfile_maxbytes=0
+          stderr_logfile=/dev/stderr
+          stderr_logfile_maxbytes=0
+          command=/usr/sbin/nginx
+        END
+
     - name: Commit updates
       run: |
         if [ -n "$(git status --porcelain)" ]; then
@@ -68,24 +91,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build upstream full fpm image from Nextcloud repository
       - name: Extract Docker metadata
-        id: meta-upstream
+        id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             latest
             ${{ env.NEXTCLOUD_VERSION }}
 
       - name: Build and push Docker image
-        id: build-and-push-upstream
+        id: build-and-push
         uses: docker/build-push-action@v4
         with:
-          file: Dockerfile-full-fpm
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-upstream.outputs.tags }}
-          labels: ${{ steps.meta-upstream.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -93,4 +114,4 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
-        run: echo "${{ steps.meta-upstream.outputs.tags }}" | xargs -I {} cosign sign -y {}@${{ steps.build-and-push-upstream.outputs.digest }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign -y {}@${{ steps.build-and-push.outputs.digest }}
