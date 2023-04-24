@@ -59,4 +59,4 @@ COPY --chown=33:33 nginx.conf /etc/nginx/
 ENV NEXTCLOUD_UPDATE=1
 
 CMD ["/usr/bin/supervisord", "-c", "/supervisord.conf"]
-RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/listen = 9000/listen = \/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf
