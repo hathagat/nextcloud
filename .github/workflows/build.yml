@@ -33,10 +33,7 @@ jobs:
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
         sed -i '/^COPY.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         sed -i '/^/var/run/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
-        cat >> Dockerfile <<END
-          # https://www.tecmint.com/connect-nginx-to-php-fpm
-          RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm\/www.sock/g' /usr/local/etc/php-fpm.d/www.conf
-        END     
+        echo "RUN sed -i 's/listen = 127.0.0.1:9000/listen = \/run\/php-fpm\/www.sock/g' /usr/local/etc/php-fpm.d/www.conf" >>Dockerfile  
         # Nginx
         sed -i 's/listen 80/listen 9000/g' nginx.conf
         sed -i 's/server app:9000/server unix:\/run\/php-fpm\/www.sock/g' nginx.conf
