@@ -31,6 +31,7 @@ jobs:
         # Dockerfile
         sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
+        sed -i '/^/var/run/supervisord.*/a    ; chown 33:33 \/var\/www\/data \\' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY php-fpm.conf \/usr\/local\/etc\/php-fpm.d\/zzz-nextcloud.conf' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
         sed -i '/^\/var\/run\/supervisord.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
@@ -40,6 +41,7 @@ jobs:
         sed -i 's/listen 80/listen 9000/g' nginx.conf
         sed -i 's/server app:9000/server unix:\/run\/php-fpm.sock/g' nginx.conf
         sed -i 's/client_max_body_size 512M/client_max_body_size 0/g' nginx.conf
+        sed -i 's/gzip on/gzip off;/g' nginx.conf
 
         # Supervisord
         cat >> supervisord.conf <<END
