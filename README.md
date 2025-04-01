@@ -9,6 +9,7 @@ Additionally they contain a Nginx web proxy running on port 9000 so you don't ne
 
 ```
 ghcr.io/hathagat/nextcloud:latest
+ghcr.io/hathagat/nextcloud:31
 ghcr.io/hathagat/nextcloud:30
 ghcr.io/hathagat/nextcloud:29
 ghcr.io/hathagat/nextcloud:28
