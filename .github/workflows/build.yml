@@ -38,7 +38,7 @@ jobs:
         # Nginx
         sed -i '/^pid        .*/a daemon off;' nginx.conf
         sed -i 's/listen 80/listen 9000/g' nginx.conf
-        sed -i 's/server app:9000/server unix:\/run\/php-fpm.sock/g' nginx.conf
+        sed -i 's/server app:9000 resolve/server unix:\/run\/php-fpm.sock/g' nginx.conf
         sed -i 's/client_max_body_size 512M/client_max_body_size 0/g' nginx.conf
         sed -i 's/gzip on/gzip off/g' nginx.conf
 
