@@ -34,6 +34,11 @@ jobs:
         sed -i '/^    \/var\/run\/supervisord.*/a    ; chown 33:33 \/var\/www\/data \\' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY php-fpm.conf \/usr\/local\/etc\/php-fpm.d\/zzz-nextcloud.conf' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
+        # Fix https://github.com/nextcloud/docker/issues/2456
+        sed -i '/libmagickcore-6/d' Dockerfile
+        sed -i '/libc-client-dev/d' Dockerfile
+        sed -i '/docker-php-ext-configure imap/d' Dockerfile
+        sed -i '/imap/d' Dockerfile
 
         # Nginx
         sed -i '/^pid        .*/a daemon off;' nginx.conf
