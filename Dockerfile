@@ -53,6 +53,7 @@ RUN mkdir -p \
 COPY supervisord.conf /
 COPY --chown=33:33 nginx.conf /etc/nginx/
 COPY php-fpm.conf /usr/local/etc/php-fpm.d/zzz-nextcloud.conf
+COPY opcache-recommended.ini /usr/local/etc/php/conf.d/
 
 ENV NEXTCLOUD_UPDATE=1
 
