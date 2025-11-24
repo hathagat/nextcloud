@@ -32,8 +32,10 @@ jobs:
         sed -i 's/nextcloud:fpm/nextcloud:${{ env.NEXTCLOUD_VERSION }}-fpm/g' Dockerfile
         sed -i 's/#       libreoffice/        nginx/g' Dockerfile
         sed -i '/^    \/var\/run\/supervisord.*/a    ; chown 33:33 \/var\/www\/data \\' Dockerfile
+        sed -i '/^COPY supervisord.conf.*/a COPY opcache-recommended.ini \/usr\/local\/etc\/php\/conf.d\/' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY php-fpm.conf \/usr\/local\/etc\/php-fpm.d\/zzz-nextcloud.conf' Dockerfile
         sed -i '/^COPY supervisord.conf.*/a COPY --chown=33:33 nginx.conf \/etc\/nginx\/' Dockerfile
+
         # Fix https://github.com/nextcloud/docker/issues/2456
         sed -i '/libmagickcore-6/d' Dockerfile
         sed -i '/libc-client-dev/d' Dockerfile
