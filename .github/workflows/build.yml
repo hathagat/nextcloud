@@ -20,6 +20,8 @@ jobs:
       commit_hash: ${{ steps.head.outputs.commit_hash }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Checkout upstream files
       run: |
         git clone --depth 1 https://github.com/nextcloud/docker.git repo
@@ -76,7 +78,7 @@ jobs:
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        force: true
+        force_with_lease: true
 
     - name: Capture commit hash
       id: head
