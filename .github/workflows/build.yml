@@ -16,6 +16,8 @@ env:
 jobs:
   update:
     runs-on: ubuntu-latest
+    outputs:
+      commit_hash: ${{ steps.head.outputs.commit_hash }}
     steps:
     - uses: actions/checkout@v4
     - name: Checkout upstream files
@@ -75,6 +77,10 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         force: true
+
+    - name: Capture commit hash
+      id: head
+      run: echo "commit_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
   build:
     needs: update
