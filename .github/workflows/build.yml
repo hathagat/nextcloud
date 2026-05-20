@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  NEXTCLOUD_VERSION: 32
+  NEXTCLOUD_VERSION: 33
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 

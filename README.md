@@ -17,9 +17,9 @@ Custom Nextcloud container images based on the [upstream FPM Dockerfile](https:/
 
 ```
 ghcr.io/hathagat/nextcloud:latest
+ghcr.io/hathagat/nextcloud:33
 ghcr.io/hathagat/nextcloud:32
 ghcr.io/hathagat/nextcloud:31
-ghcr.io/hathagat/nextcloud:30
 ```
 
 Only `latest` and the current major are rebuilt on schedule. Older tags remain available as the last build of that major version and do not receive further updates.
