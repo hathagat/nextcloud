@@ -111,11 +111,12 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
-          context: git
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             latest
             ${{ env.NEXTCLOUD_VERSION }}
+          labels: |
+            org.opencontainers.image.revision=${{ needs.update.outputs.commit_hash }}
 
       - name: Build and push Docker image
         id: build-and-push
