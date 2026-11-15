@@ -2,3 +2,4 @@
 !/nginx.conf
 !php-fpm.conf
 !/supervisord.conf
+!/opcache-recommended.ini

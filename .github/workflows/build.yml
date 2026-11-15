@@ -111,6 +111,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
+          context: git
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             latest
@@ -120,6 +121,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v7
         with:
+          context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
